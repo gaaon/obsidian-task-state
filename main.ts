@@ -1,60 +1,77 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Modal, Notice, Plugin, PluginSettingTab, Setting, PluginManifest } from 'obsidian';
+import { Pos } from 'codemirror'
 
-interface MyPluginSettings {
-	mySetting: string;
+interface TaskStateNotesPluginSettings {
+	todoName: string;
+	doneName: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+const DEFAULT_SETTINGS: TaskStateNotesPluginSettings = {
+	todoName: 'TODO',
+	doneName: 'DONE',
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class TaskStateNotesPlugin extends Plugin {
+	settings: TaskStateNotesPluginSettings
+	cmRef: CodeMirror.Editor
+
+	constructor(app: App, manifest: PluginManifest) {
+		super(app, manifest)
+
+		this.handleCmChanged = this.handleCmChanged.bind(this)
+	}
 
 	async onload() {
 		console.log('loading plugin');
 
-		await this.loadSettings();
-
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
-
-		this.addStatusBarItem().setText('Status Bar Text');
-
-		this.addCommand({
-			id: 'open-sample-modal',
-			name: 'Open Sample Modal',
-			// callback: () => {
-			// 	console.log('Simple Callback');
-			// },
-			checkCallback: (checking: boolean) => {
-				let leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		await this.loadSettings()
 
 		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			console.log('codemirror', cm);
-		});
-
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+			this.cmRef = cm
+			cm.on('change', this.handleCmChanged)
+		})
 	}
 
 	onunload() {
 		console.log('unloading plugin');
+
+		this.cmRef?.off('change', this.handleCmChanged)
+	}
+
+	handleCmChanged(cm: CodeMirror.Editor, changeObj: CodeMirror.EditorChangeLinkedList) {
+		if (changeObj.origin === 'setValue') {
+			return
+		}
+
+		changeObj.text.forEach(text => {
+			const {todoName, doneName} = this.settings
+
+			if (text.endsWith('- [ ] ')) {
+				const doc = cm.getDoc()
+				const cursor = doc.getCursor()
+
+				doc.replaceRange(`[[${todoName}]] `, cursor)
+
+				return
+			}
+
+			if (text.includes(`[ ] [[${doneName}]]`) && changeObj.removed?.[0]?.includes(`[x] [[${doneName}]]`) === true) {
+				this.replaceLine(cm, text, `[[${doneName}]]`, `[[${todoName}]]`)
+			}
+
+			if (text.includes(`[x] [[${todoName}]]`) && changeObj.removed?.[0]?.includes(`[ ] [[${todoName}]]`) === true) {
+				this.replaceLine(cm, text, `[[${todoName}]]`, `[[${doneName}]]`)
+			}
+		})
+	}
+
+	replaceLine(cm: CodeMirror.Editor, text: string, from: string, to: string) {
+		const doc = cm.getDoc()
+		const cursor = doc.getCursor()
+
+		const newText = text.replace(from, to)
+		doc.setSelection(Pos(cursor.line, 0), Pos(cursor.line, cursor.ch))
+		doc.replaceSelection(newText)
 	}
 
 	async loadSettings() {
@@ -63,50 +80,5 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		let {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		let {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
