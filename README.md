@@ -2,7 +2,7 @@
 
 With Obsidian Task State Notes, each task will be managed along with state note.
 
-### example 
+### Usage Example 
 
 If you add new task with empty bracket by hitting `cmd + enter`, plugin will automatically link state page.
 
@@ -13,7 +13,7 @@ If you add new task with empty bracket by hitting `cmd + enter`, plugin will aut
 ->
 
 ```yml
-- [ ] [[TODO]] # [[TODO]] automatically added
+- [ ] [[TODO]] # automatically add [[TODO]]
 ```
 
 Fill task content whatever you want. After completing the task, you just enter `cmd + enter` again.
@@ -25,7 +25,13 @@ Fill task content whatever you want. After completing the task, you just enter `
 ->
 
 ```yml
-- [x] [[DONE]] new task to do # [[DONE]] automatically changed
+- [x] [[DONE]] new task to do # automatically change [[TODO]] to [[DONE]]
 ```
+
+### How to install
+Copy over `main.js`, `styles.css`, `manifest.json` to your vault `<vault-path>/.obsidian/plugins/task-state-notes`.
+
+### Support
+[Karrot](https://uk.karrotmarket.com)
 
 It's over. Happy obsidian.
