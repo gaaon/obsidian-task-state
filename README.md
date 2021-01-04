@@ -1,6 +1,6 @@
-## Obsidian Task State Notes
+## Obsidian Task State
 
-With Obsidian Task State Notes, each task will be managed along with state note.
+With Obsidian Task State, each task will be managed along with state note.
 
 ### Usage Example 
 
@@ -29,7 +29,7 @@ Fill task content whatever you want. After completing the task, you just enter `
 ```
 
 ### How to install
-Copy over `main.js`, `styles.css`, `manifest.json` to your vault `<vault-path>/.obsidian/plugins/task-state-notes`.
+Copy over `main.js`, `styles.css`, `manifest.json` to your vault `<vault-path>/.obsidian/plugins/task-state`.
 
 ### Support
 [Karrot](https://uk.karrotmarket.com)
