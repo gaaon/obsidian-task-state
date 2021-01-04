@@ -29,7 +29,15 @@ Fill task content whatever you want. After completing the task, you just enter `
 ```
 
 ### How to install
-Copy over `main.js`, `styles.css`, `manifest.json` to your vault `<vault-path>/.obsidian/plugins/task-state`.
+
+1. Build the project.
+
+```shell
+npm install
+npm run build
+```
+
+2. Copy over `main.js`, `styles.css`, `manifest.json` to your vault `<vault-path>/.obsidian/plugins/task-state`.
 
 ### Support
 [Karrot](https://uk.karrotmarket.com)
