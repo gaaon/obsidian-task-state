@@ -39,7 +39,15 @@ npm run build
 
 2. Copy over `main.js`, `styles.css`, `manifest.json` to your vault `<vault-path>/.obsidian/plugins/task-state`.
 
+### Roadmap
+
+- [ ] Sync checkbox with task state in preview mode (If click task checkbox in preview mode, task state also changed)
+- [ ] Customize todo, done task name
+- [ ] Support backlink display text (ex. `[[TODO|❗]]` will display ❗instead of `TODO` in preview mode)
+
 ### Support
 [Karrot](https://uk.karrotmarket.com)
+
+
 
 It's over. Happy obsidian.
